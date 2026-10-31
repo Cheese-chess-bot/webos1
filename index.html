@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  >
+
+  <meta
+    name="description"
+    content="Orbit Desk V4 — a browser desktop with productivity apps, an embedded browser, and a game arcade."
+  >
+
+  <meta name="theme-color" content="#10252a">
+
+  <title>Orbit Desk V4</title>
+
+  <link rel="stylesheet" href="./style.css">
+</head>
+
+<body>
+  <header>
+    <button
+      id="home"
+      class="brand"
+      type="button"
+      aria-label="Open application launcher"
+    >
+      ✳ Orbit Desk
+    </button>
+
+    <button id="searchButton" type="button">
+      Search apps
+      <kbd>Ctrl K</kbd>
+    </button>
+
+    <span id="version">V4</span>
+
+    <time id="clock" aria-label="Current time"></time>
+  </header>
+
+  <main id="desktop">
+    <div class="planet" aria-hidden="true"></div>
+
+    <div class="desktop-message">
+      <h1 id="headline">Make space for your ideas.</h1>
+      <p>YOUR OWN LITTLE CORNER OF SPACE</p>
+    </div>
+
+    <div id="windows"></div>
+  </main>
+
+  <nav id="dock" aria-label="Applications"></nav>
+
+  <dialog id="launcher" aria-labelledby="launcherTitle">
+    <form method="dialog" class="dialog-heading">
+      <strong id="launcherTitle">Launch an app</strong>
+
+      <button
+        type="submit"
+        aria-label="Close application launcher"
+      >
+        ×
+      </button>
+    </form>
+
+    <input
+      id="search"
+      type="search"
+      placeholder="Search apps..."
+      aria-label="Search applications"
+      autocomplete="off"
+      spellcheck="false"
+    >
+
+    <div id="searchResults"></div>
+
+    <small>
+      Tab to choose · Enter to open · Escape to close
+    </small>
+  </dialog>
+
+  <div
+    id="toast"
+    role="status"
+    aria-live="polite"
+    aria-atomic="true"
+  ></div>
+
+  <noscript>
+    <p>
+      Enable JavaScript in your browser to use Orbit Desk.
+    </p>
+  </noscript>
+
+  <!-- Keep this exact loading order. -->
+  <script src="./app.js"></script>
+  <script src="./v2.js"></script>
+  <script src="./v3.js"></script>
+  <script src="./v4.js"></script>
+</body>
+</html>
