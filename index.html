@@ -1,27 +1,38 @@
 <!DOCTYPE html>
+<!-- 
+  TODO: maybe clean up the meta tags later, but honestly it works fine as is.
+  Remember we split the scripts into v2, v3, v4 because app.js got too massive lol
+-->
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+<meta charset="UTF-8">
 
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1"
-  >
+<!-- mobile stuff, don't touch or iOS safari breaks(2hrs of reading docs gng) -->
+<meta
+name="viewport"
+content="width=device-width, initial-scale=1"
+>
 
   <meta
     name="description"
     content="Orbit Desk V4 — a browser desktop with productivity apps, an embedded browser, and a game arcade."
   >
 
+  <!-- dark mode toolbar color thingy -->
   <meta name="theme-color" content="#10252a">
 
-  <title>Orbit Desk V4</title>
+  <title>Orbit Desk V4 (DEV)</title>
 
+  <!-- linking local stylesheet -->
   <link rel="stylesheet" href="./style.css">
 </head>
 
 <body>
   <header>
+    <!-- 
+      FIXME: sometimes this button gets stuck if you double click too fast.
+      Leaving it for now since theres 2 projects of webos 1 and 2
+    -->
     <button
       id="home"
       class="brand"
@@ -36,24 +47,28 @@
       <kbd>Ctrl K</kbd>
     </button>
 
-    <span id="version">V4</span>
+    <span id="version">V4-beta</span>
 
     <time id="clock" aria-label="Current time"></time>
   </header>
 
   <main id="desktop">
+    <!-- background decorative planet element -->
     <div class="planet" aria-hidden="true"></div>
 
     <div class="desktop-message">
       <h1 id="headline">Make space for your ideas.</h1>
+      <!-- keeping this uppercase style cuz why not?✌️💀 -->
       <p>YOUR OWN LITTLE CORNER OF SPACE</p>
     </div>
 
+    <!-- windows will be injected here dynamically by js -->
     <div id="windows"></div>
   </main>
 
   <nav id="dock" aria-label="Applications"></nav>
 
+  <!-- App launcher modal -->
   <dialog id="launcher" aria-labelledby="launcherTitle">
     <form method="dialog" class="dialog-heading">
       <strong id="launcherTitle">Launch an app</strong>
@@ -82,6 +97,7 @@
     </small>
   </dialog>
 
+  <!-- Toast notifications container -->
   <div
     id="toast"
     role="status"
@@ -91,14 +107,18 @@
 
   <noscript>
     <p>
-      Enable JavaScript in your browser to use Orbit Desk.
+      Enable JavaScript in your browser to use Orbit Desk. Seriously, it won't do anything without JS.
     </p>
   </noscript>
 
-  <!-- Keep this exact loading order. -->
+  <!-- 
+    IMPORTANT: Keep this exact loading order. 
+    v2 depends on app.js, v3 depends on v2... spaghetti architecture at its finest! 
+  -->
   <script src="./app.js"></script>
   <script src="./v2.js"></script>
   <script src="./v3.js"></script>
   <script src="./v4.js"></script>
+  <!-- <script src="./debug-tools.js"></script> commented out for production -->
 </body>
 </html>
