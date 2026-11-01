@@ -2,7 +2,6 @@
 
 document.querySelector("#version").textContent = "V2";
 
-// FEATURE 4: LOCAL TEXT FILES
 OS.register("files", "Text files", "▤", container => {
   const stored = OS.read("files", []);
 
@@ -19,27 +18,27 @@ OS.register("files", "Text files", "▤", container => {
   container.innerHTML = `
     <h2>Your text files</h2>
 
-    <div class="row">
-      <button class="new primary">New file</button>
-      <button class="export" disabled>Export .txt</button>
-      <button class="delete" disabled>Delete file</button>
+    <div class = "row">
+      <button class = "new primary">New file</button>
+      <button class = "export" disabled>Export .txt</button>
+      <button class = "delete" disabled>Delete file</button>
     </div>
 
     <p>Saved in this browser. Export files you want to keep elsewhere.</p>
-    <div class="file-list"></div>
+    <div class = "file-list"></div>
 
-    <div class="stack">
+    <div class = "stack">
       <label>
         Filename
-        <input class="filename" maxlength="80" disabled>
+        <input class = "filename" maxlength = "80" disabled>
       </label>
 
       <label>
         Contents
-        <textarea class="file-content" disabled></textarea>
+        <textarea class = "file-content" disabled></textarea>
       </label>
 
-      <small class="save-status" role="status">Choose or create a file.</small>
+      <small class = "save-status" role = "status">Choose or create a file.</small>
     </div>
   `;
 
@@ -131,13 +130,11 @@ OS.register("files", "Text files", "▤", container => {
   select(files.length ? 0 : -1);
 });
 
-// FEATURE 5: CALCULATOR
-// Explicit arithmetic operations; no eval().
 OS.register("calculator", "Calculator", "▦", container => {
   container.innerHTML = `
     <h2>Calculator</h2>
-    <div class="calculator">
-      <output aria-live="polite">0</output>
+    <div class = "calculator">
+      <output aria-live = "polite">0</output>
     </div>
     <small>Calculates one operation at a time, left to right.</small>
   `;
@@ -203,7 +200,7 @@ OS.register("calculator", "Calculator", "▦", container => {
           ? display.slice(1)
           : "-" + display;
       }
-    } else if (key === "=") {
+    } else if (key === " = ") {
       if (operation !== null && previous !== null) {
         display = result(
           calculate(previous, Number(display), operation)
@@ -241,20 +238,18 @@ OS.register("calculator", "Calculator", "▦", container => {
     "7", "8", "9", "×",
     "4", "5", "6", "−",
     "1", "2", "3", "+",
-    "0", ".", "="
+    "0", ".", " = "
   ].forEach(key => {
     const button = document.createElement("button");
     button.textContent = key;
     button.onclick = () => press(key);
 
-    if (key === "=") button.className = "primary";
+    if (key === " = ") button.className = "primary";
 
     grid.append(button);
   });
 });
 
-// FEATURE 6: FOCUS TIMER
-// Deadline-based timing prevents background-tab interval drift.
 const focusState = {
   duration: 25 * 60,
   remaining: 25 * 60,
@@ -303,19 +298,19 @@ OS.register("focus", "Focus timer", "◷", container => {
 
     <label>
       Session length
-      <select class="duration">
-        <option value="5">5 minutes</option>
-        <option value="15">15 minutes</option>
-        <option value="25">25 minutes</option>
-        <option value="50">50 minutes</option>
+      <select class = "duration">
+        <option value = "5">5 minutes</option>
+        <option value = "15">15 minutes</option>
+        <option value = "25">25 minutes</option>
+        <option value = "50">50 minutes</option>
       </select>
     </label>
 
-    <div class="timer focus-time">25:00</div>
+    <div class = "timer focus-time">25:00</div>
 
-    <div class="row">
-      <button class="primary focus-toggle">Start</button>
-      <button class="focus-reset">Reset</button>
+    <div class = "row">
+      <button class = "primary focus-toggle">Start</button>
+      <button class = "focus-reset">Reset</button>
     </div>
 
     <p>
