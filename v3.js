@@ -1,8 +1,10 @@
+// TODO: clean this up later, quick patch for version display
 "use strict";
 
 document.querySelector("#version").textContent = "V3";
 
 // FEATURE 7: DRAWING APP
+// let's register the paint app here - hope the canvas doesn't lag too much lol
 OS.register("paint", "Drawing studio", "✎", container => {
   container.innerHTML = `
     <h2>Drawing studio</h2>
@@ -46,6 +48,7 @@ OS.register("paint", "Drawing studio", "✎", container => {
   const ink = container.querySelector(".ink");
   const brush = container.querySelector(".brush");
 
+  // set white bg by default so it's not transparent
   context.fillStyle = "#ffffff";
   context.fillRect(0, 0, canvas.width, canvas.height);
   context.lineCap = "round";
@@ -53,14 +56,13 @@ OS.register("paint", "Drawing studio", "✎", container => {
 
   let drawing = false;
 
-  function position(event) {
+  // getting mouse/touch position on canvas properly
+  function getMousePos(event) {
     const bounds = canvas.getBoundingClientRect();
 
     return {
-      x: (event.clientX - bounds.left) *
-        canvas.width / bounds.width,
-      y: (event.clientY - bounds.top) *
-        canvas.height / bounds.height
+      x: (event.clientX - bounds.left) * canvas.width / bounds.width,
+      y: (event.clientY - bounds.top) * canvas.height / bounds.height
     };
   }
 
@@ -69,7 +71,7 @@ OS.register("paint", "Drawing studio", "✎", container => {
     canvas.setPointerCapture(event.pointerId);
     drawing = true;
 
-    const point = position(event);
+    const point = getMousePos(event);
 
     context.strokeStyle = ink.value;
     context.fillStyle = ink.value;
@@ -91,9 +93,9 @@ OS.register("paint", "Drawing studio", "✎", container => {
   };
 
   canvas.onpointermove = event => {
-    if (!drawing) return;
+    if (!drawing) return; // bail out if not drawing
 
-    const point = position(event);
+    const point = getMousePos(event);
     context.lineTo(point.x, point.y);
     context.stroke();
   };
@@ -102,6 +104,7 @@ OS.register("paint", "Drawing studio", "✎", container => {
     drawing = false;
   };
 
+  // clear button logic
   container.querySelector(".clear").onclick = () => {
     if (!confirm("Clear this drawing? Export first if needed.")) return;
 
@@ -130,6 +133,7 @@ OS.register("paint", "Drawing studio", "✎", container => {
 
 // FEATURE 8: BACKUP AND RESTORE
 // Only known data types are imported. Imported strings are never inserted as executable HTML.
+// Remember: validation is super important here so nobody injects weird stuff into local storage!
 function validateBackup(data) {
   if (!data || data.format !== "orbit-copy-backup" ||
       data.version !== 1) {
@@ -164,6 +168,7 @@ function validateBackup(data) {
   if (!filesValid) throw new Error("Invalid text file data.");
   if (!validTheme(data.theme)) throw new Error("Invalid theme.");
 
+  // returning sanitized object
   return {
     tasks: data.tasks.map(task => ({
       title: task.title,
@@ -254,7 +259,8 @@ OS.register("backup", "Backup and restore", "⇅", container => {
       const previous = new Map();
 
       // Keep previous values so a failed write can be rolled back.
-      for (const key of keys) {
+      for (let i = 0; i < keys.length; i++) {
+        const key = keys[i];
         previous.set(key, localStorage.getItem(OS.prefix + key));
       }
 
@@ -265,7 +271,8 @@ OS.register("backup", "Backup and restore", "⇅", container => {
             JSON.stringify(data[key])
           );
         }
-      } catch (error) {
+      } catch (err) {
+        // roll back everything if it blows up
         for (const key of keys) {
           localStorage.removeItem(OS.prefix + key);
         }
@@ -276,14 +283,16 @@ OS.register("backup", "Backup and restore", "⇅", container => {
           }
         }
 
-        throw error;
+        throw err;
       }
 
       // Close editors that still hold old in-memory data.
       for (const id of ["tasks", "files", "wallpaper"]) {
-        OS.windows.get(id)
-          ?.querySelector('[aria-label="Close"]')
-          ?.click();
+        const win = OS.windows.get(id);
+        if (win) {
+          const closeBtn = win.querySelector('[aria-label="Close"]');
+          if (closeBtn) closeBtn.click();
+        }
       }
 
       applyTheme(data.theme);
@@ -299,15 +308,20 @@ OS.register("backup", "Backup and restore", "⇅", container => {
 
 //FEATURE 9: SAVED WINDOW LAYOUT
 function captureLayout() {
-  return [...OS.windows.entries()].map(([id, windowElement]) => ({
-    id,
-    left: windowElement.offsetLeft,
-    top: windowElement.offsetTop,
-    width: windowElement.offsetWidth,
-    height: windowElement.offsetHeight,
-    hidden: windowElement.hidden,
-    maximized: windowElement.classList.contains("maximized")
-  }));
+  // map entries into a nice clean array of window states
+  let layoutArr = [];
+  for (let [id, windowElement] of OS.windows.entries()) {
+    layoutArr.push({
+      id: id,
+      left: windowElement.offsetLeft,
+      top: windowElement.offsetTop,
+      width: windowElement.offsetWidth,
+      height: windowElement.offsetHeight,
+      hidden: windowElement.hidden,
+      maximized: windowElement.classList.contains("maximized")
+    });
+  }
+  return layoutArr;
 }
 
 function restoreLayout() {
@@ -324,7 +338,13 @@ function restoreLayout() {
     if (!item || !OS.apps.has(item.id)) continue;
 
     const numbers = ["left", "top", "width", "height"];
-    if (!numbers.every(key => Number.isFinite(item[key]))) continue;
+    let isValidNumbers = true;
+    for(let k = 0; k < numbers.length; k++) {
+      if(!Number.isFinite(item[numbers[k]])) {
+        isValidNumbers = false;
+      }
+    }
+    if (!isValidNumbers) continue;
 
     const windowElement = OS.open(item.id);
 
@@ -351,10 +371,11 @@ function restoreLayout() {
       Math.min(item.top, desktop.clientHeight - 130)
     ) + "px";
 
-    windowElement.classList.toggle(
-      "maximized",
-      Boolean(item.maximized)
-    );
+    if (item.maximized) {
+      windowElement.classList.add("maximized");
+    } else {
+      windowElement.classList.remove("maximized");
+    }
 
     windowElement.hidden = Boolean(item.hidden);
   }
@@ -393,7 +414,8 @@ OS.register("workspace", "Workspace layout", "▣", container => {
   };
 
   container.querySelector(".save").onclick = () => {
-    if (OS.save("layout", captureLayout())) {
+    const success = OS.save("layout", captureLayout());
+    if (success) {
       OS.notify("Workspace layout saved.");
     }
   };
@@ -404,10 +426,13 @@ OS.register("workspace", "Workspace layout", "▣", container => {
   };
 });
 
-if (OS.read("autoLayout", false) === true) {
+// Check if we should auto load layout on start
+const shouldAutoLoad = OS.read("autoLayout", false);
+if (shouldAutoLoad === true) {
+  // wait a tiny bit for DOM to settle? Nah, just call it directly for now(if it crashes then i got nothin to do gng)
   restoreLayout();
 }
 
-//PLANS FOR V4
-//Add a browser
-//Add a game tab
+// PLANS FOR V4:
+// - Add a browser app (iframe based maybe? only way btw)
+// - Add a game tab help me (dad suggested snake or tetris, let's look into canvas games)
